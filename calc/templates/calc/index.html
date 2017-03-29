@@ -1,0 +1,74 @@
+<h1>Course Credit Hour Calculator</h1>
+<p>Fill in your course details below and then choose the course activities you want to use in your course by indicating the amount of weekly work required for each of your chosen activities.</p>
+
+<h2>Course Details</h2>
+<h3>Course Credits</h3>
+<form method="post">
+{% csrf_token %}
+  <input type="radio" name="credits" id="1" value="1" />
+  <label>1 credit</label> <br />
+  <input type="radio" name="credits" id="2" value="2" />
+  <label>2 credits</label><br />
+  <input type="radio" name="credits" id="3" value="3" checked />
+  <label>3 credits</label><br />
+  <input type="radio" name="credits" id="4" value="4" />
+  <label>4 credits</label><br />
+
+<h3>Course Length</h3>
+{% csrf_token %}
+  <input type="radio" name="weeks" id="6" value="6" />
+  <label>6 weeks</label> <br />
+  <input type="radio" name="weeks" id="15" value="15" checked />
+  <label>15 weeks</label><br />
+
+<h2>Course Activities</h2>
+<p>For each activity you would like to include in your course, indicate the number of hours each week the activity will require.</p>
+<h3>Contact Time Activities</h3>
+  {% for activity in activity_list %}
+  {% if activity.activity_type == "Contact Time" %}
+  <input type="text" size="2" maxlength="2" placeholder="0" name="hoursContact{{ activity.id }}" id="hoursContact{{ forloop.counter }}" />
+  <label><a href="{% url 'calc:activity' activity.id %}">{{ activity.activity_name }}</a></label><br />
+  {% endif %}
+  {% endfor %}
+
+<h3>Independent Learning Activities</h3>
+  {% for activity in activity_list %}
+  {% if activity.activity_type == "Independent Learning" %}
+  <input type="text" size="2" maxlength="2" placeholder="0" name="hoursIndependent{{ activity.id }}" id="hoursIndependent{{ forloop.counter }}" />
+  <label><a href="{% url 'calc:activity' activity.id %}">{{ activity.activity_name }}</a></label><br />
+  {% endif %}
+  {% endfor %}
+  <input type="submit" value="Submit">
+  </form>
+
+  {% if request.method == 'POST' %}
+<h2>Results</h2>
+  {% if weeks == 15 %}
+<h3>Contact Time Total Weekly Hours</h3>
+  {% if hoursContactTotal == 0 or hoursContactTotal < credits %}
+  <p>You still need some more contact time activities to meet credit hour requirements. In this case, you need {{ credits }} hours worth and you only have {{ hoursContactTotal }}. </p>
+  {% else %}
+  <p>Great job. You have the required amount of contact time activities for the number of course credit. You needed {{ credits }} hours and you came up with {{ hoursContactTotal }}. </p>
+  {% endif %}
+<h3>Independent Learning Total Weekly Hours</h3>
+  {% if hoursIndependentTotal >= credits_double %}
+  <p>Great job. You have the required amount of contact time activities for the number of course credit. You needed {{ credits_double }} hours and you came up with {{ hoursIndependentTotal }}. </p>
+  {% else %}
+  <p>You still need some more contact time activities to meet credit hour requirements. In this case, you need {{ credits_double }} hours worth and you only have {{ hoursIndependentTotal }}.  </p>
+  {% endif %}
+
+  {% else %}
+  <h3>Contact Time Total Weekly Hours</h3>
+    {% if hoursContactTotal == 0 or hoursContactTotal < credits_double %}
+    <p>You still need some more contact time activities to meet credit hour requirements. In this case, you need {{ credits_double }} hours worth and you only have {{ hoursContactTotal }}.</p>
+    {% else %}
+    <p>Great job. You've have the required amount of contact time activities for the number of course credit. You needed {{ credits_double }} hours and you came up with {{ hoursContactTotal }}. </p>
+    {% endif %}
+  <h3>Independent Learning Total Weekly Hours</h3>
+    {% if hoursIndependentTotal >= credits_quadrupled %}
+    <p>Great job. You have the required amount of contact time activities for the number of course credit. You needed {{ credits_quadrupled }} hours and you came up with {{ hoursIndependentTotal }} </p>
+    {% else %}
+    <p>You still need some more contact time activities to meet credit hour requirements. In this case, you need {{ credits_quadrupled }} hours worth and you only  have {{ hoursIndependentTotal }}. </p>
+    {% endif %}
+  {% endif %}
+  {% endif %}
